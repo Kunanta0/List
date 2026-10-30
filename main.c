@@ -16,8 +16,30 @@ int main()
     ListPushFront(list_ptr, 13);
     ListPushBack(list_ptr, 15);
 
-    size_t idx = ListFindIndex(list_ptr, 6);
+    int idx = ListFindIndex(list_ptr, 5);
     ListErase(list_ptr, idx);
+
+    idx = ListFind(list_ptr, 8);
+    ListInsertAfter(list_ptr, idx, 7);
+
+    idx = ListFindIndex(list_ptr, 6);
+    ListInsertAfter(list_ptr, idx, 20);
+
+    ListPopBack(list_ptr);
+
+    idx = ListFind(list_ptr, 15);
+    ListInsertBefore(list_ptr, idx, 12);
+
+    idx = ListFindIndex(list_ptr, 1);
+    ListInsertBefore(list_ptr, idx, 5);
+
+    ListPopBack(list_ptr);
+    ListPopFront(list_ptr);
+
+    for (int i = 0; i < 10; ++i)
+    {
+        ListPushBack(list_ptr, 67);
+    }
     //printf("%d\n", lst.data[lst.head]);
 
     ListPrint(list_ptr);
