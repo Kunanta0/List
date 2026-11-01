@@ -45,6 +45,23 @@ int ListFind(List_t* lst, int value);
 int ListFindIndex(List_t* lst, int idx);
 int ListInsertAfter(List_t* lst, int idx, int value);
 int ListInsertBefore(List_t* lst, int idx, int value);
+int ListClear(List_t* lst);
+
+/*int ListClear(List_t* lst)
+{
+    ListVerify(lst);
+    lst->next[0] = zero;
+    lst->prev[0] = zero;
+
+    for (int i = 1; i < lst->capacity; ++i)
+    {
+        lst->next[i] = i + 1;
+        lst->prev[i] = none;
+    }
+    lst->next[lst->capacity] = zero;
+
+    return ListVerify(lst);
+}*/
 
 int ListInsertBefore(List_t* lst, int idx, int value)
 {
@@ -56,7 +73,7 @@ int ListInsertBefore(List_t* lst, int idx, int value)
         lst->next[id] = idx;
         lst->next[lst->prev[id]] = id;
         lst->prev[idx] = id;
-        printf("IM here!\n");
+        //printf("IM here!\n");
     }
 
     else ListPushFront(lst, value);
@@ -73,7 +90,7 @@ int ListInsertAfter(List_t* lst, int idx, int value)
         lst->prev[id] = idx;
         lst->prev[lst->next[id]] = id;
         lst->next[idx] = id;
-        printf("IM here!\n");
+        //printf("IM here!\n");
     }
     else ListPushBack(lst, value);
     return ListVerify(lst);
@@ -86,7 +103,7 @@ int ListFind(List_t* lst, int value)
         if (lst->data[i] == value) return i;
     }
 
-    return none;
+    return zero;
 }
 
 int ListFindIndex(List_t* lst, int idx)
@@ -147,7 +164,7 @@ void ListFreeNode(List_t* lst, int idx)
 
 int ListAllocNode(List_t* lst)
 {
-    if (lst->free_head == 0) return none;
+    if (lst->free_head == 0) return zero;
     int idx = lst->free_head;
     lst->free_head = lst->next[idx];
     return idx;
@@ -182,7 +199,7 @@ int ListVerify(List_t* lst)
 int ListPushFront(List_t* lst, int value)
 {
     int idx = ListAllocNode(lst);
-    if (idx == none) return LIST_OVERFLOW;
+    if (idx == zero) return LIST_OVERFLOW;
 
     lst->data[idx] = value;
     lst->prev[idx] = zero;
@@ -198,7 +215,7 @@ int ListPushFront(List_t* lst, int value)
 int ListPushBack(List_t* lst, int value)
 {
     int idx = ListAllocNode(lst);
-    if (idx == none) return LIST_OVERFLOW;
+    if (idx == zero) return LIST_OVERFLOW;
 
     lst->data[idx] = value;
     lst->next[idx] = zero;
@@ -225,15 +242,13 @@ int CreateList(List_t* lst, int capacity)
     lst->next[0] = zero;
     lst->prev[0] = zero;
 
-    for (int i = 1; i < capacity; ++i)
+    for (int i = 1; i <= capacity; ++i)
     {
+        lst->data[i] = poizon;
         lst->next[i] = i + 1;
         lst->prev[i] = none;
     }
     lst->next[capacity] = zero;
-
-    //PrevInit(&lst);
-    //NextInit(&lst);
     return ListVerify(lst);
 }
 
