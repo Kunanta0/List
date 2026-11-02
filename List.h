@@ -21,7 +21,8 @@ enum
     LIST_OVERFLOW = 6,
     LOOP_LIST = 7,
     ELEMENT_DOES_NOT_EXIST = 8,
-    LIST_INDEX_OUT_OF_RANGE = 9
+    LIST_INDEX_OUT_OF_RANGE = 9,
+    INVALID_INDEX = 10
 };
 
 typedef struct
@@ -46,12 +47,23 @@ void ListPopFront(List_t* lst);
 void ListPrint(List_t* lst);
 int ListFind(List_t* lst, int value);
 int ListFindIndex(List_t* lst, int idx);
-void ListInsertAfter(List_t* lst, int idx, int value);
-void ListInsertBefore(List_t* lst, int idx, int value);
+int ListInsertAfter(List_t* lst, int idx, int value);
+int ListInsertBefore(List_t* lst, int idx, int value);
 void ListClear(List_t* lst);
 void ListDump(List_t* lst);
 void ListLink(List_t* lst, int idx, int a, int b);
 void ListFree(List_t* lst);
+int CheckIndex(List_t* lst, int idx);
+
+int CheckIndex(List_t* lst, int idx)
+{
+    if (idx > lst->capacity) return LIST_INDEX_OUT_OF_RANGE;
+    for (int i = lst->free_head; i != 0; i = lst->next[i])
+    {
+        if (idx == i) return INVALID_INDEX;
+    }
+    return OK;
+}
 
 #ifndef DEBUG
 #define CHECK()
@@ -134,44 +146,76 @@ void ListClear(List_t* lst)
     CHECK();
 }
 
-void ListInsertBefore(List_t* lst, int idx, int value)
+int ListInsertBefore(List_t* lst, int idx, int value)
 {
     int state = OK;
     CHECK();
 
-    if (lst->prev[idx] != zero)
+    #ifdef DEBUG
+    state = CheckIndex(lst, idx);
+    if (state != OK)
     {
-        int id = ListAllocNode(lst);
-        lst->data[id] = value;
-        lst->prev[id] = lst->prev[idx];
-        lst->next[id] = idx;
-        lst->next[lst->prev[id]] = id;
-        lst->prev[idx] = id;
-        //printf("IM here!\n");
+        printf("ERROR %d, index %d is forbidden\n", state, idx);
+        ListDump(lst);
+        return state;
+    }
+    #endif
+
+    int id = ListAllocNode(lst);
+
+    if (id == zero)
+    {
+        #ifdef DEBUG
+        printf("ERROR %d, element %d haven't been pushed front, because capacity = %d\nList: ", LIST_OVERFLOW, value, lst->capacity);
+        ListPrint(lst);
+        printf("\n");
+        #endif
+        return LIST_OVERFLOW;
     }
 
-    else ListPushFront(lst, value);
+    lst->data[id] = value;
+    int left = lst->prev[idx];
+    int right = idx;
+    ListLink(lst, id, left, right);
     CHECK();
+
+    return OK;
 }
 
-void ListInsertAfter(List_t* lst, int idx, int value)
+int ListInsertAfter(List_t* lst, int idx, int value)
 {
     int state = OK;
     CHECK();
 
-    if (lst->next[idx] != zero)
+    #ifdef DEBUG
+    state = CheckIndex(lst, idx);
+    if (state != OK)
     {
-        int id = ListAllocNode(lst);
-        lst->data[id] = value;
-        lst->next[id] = lst->next[idx];
-        lst->prev[id] = idx;
-        lst->prev[lst->next[id]] = id;
-        lst->next[idx] = id;
-        //printf("IM here!\n");
+        printf("ERROR %d, index %d is forbidden\n", state, idx);
+        ListDump(lst);
+        return state;
     }
-    else ListPushBack(lst, value);
+    #endif
 
+    int id = ListAllocNode(lst);
+
+    if (id == zero)
+    {
+        #ifdef DEBUG
+        printf("ERROR %d, element %d haven't been pushed front, because capacity = %d\nList: ", LIST_OVERFLOW, value, lst->capacity);
+        ListPrint(lst);
+        printf("\n");
+        #endif
+        return LIST_OVERFLOW;
+    }
+
+    lst->data[id] = value;
+    int right = lst->next[idx];
+    int left = idx;
+    ListLink(lst, id, left, right);
     CHECK();
+
+    return OK;
 }
 
 int ListFind(List_t* lst, int value)
@@ -310,50 +354,28 @@ int ListPushFront(List_t* lst, int value)
 {
     int state = OK;
     CHECK();
-
-    int idx = ListAllocNode(lst);
-    if (idx == zero)
-    {
-        #ifdef DEBUG
-        printf("ERROR %d, element %d haven't been pushed front, because capacity = %d\nList: ", LIST_OVERFLOW, value, lst->capacity);
-        ListPrint(lst);
-        printf("\n");
-        #endif
-        return LIST_OVERFLOW;
-    }
-
-    lst->data[idx] = value;
-
-    int head = lst->next[0];
-    ListLink(lst, idx, 0, head);
-
-    CHECK();
-    return OK;
+    #ifndef DEBUG
+    return ListInsertBefore(lst, lst->next[0], value);
+    #else
+    #undef DEBUG
+    state = ListInsertBefore(lst, lst->next[0], value);
+    #define DEBUG
+    return state;
+    #endif
 }
 
 int ListPushBack(List_t* lst, int value)
 {
     int state = OK;
     CHECK();
-
-    int idx = ListAllocNode(lst);
-    if (idx == zero)
-    {
-        #ifdef DEBUG
-        printf("ERROR %d, element %d haven't been pushed back, because capacity = %d\nList: ", LIST_OVERFLOW, value, lst->capacity);
-        ListPrint(lst);
-        printf("\n");
-        #endif
-        return LIST_OVERFLOW;
-    }
-
-    lst->data[idx] = value;
-
-    int tail = lst->prev[0];
-    ListLink(lst, idx, tail, 0);
-
-    CHECK();
-    return OK;
+    #ifndef DEBUG
+    return ListInsertAfter(lst, lst->prev[0], value);
+    #else
+    #undef DEBUG
+    state = ListInsertAfter(lst, lst->prev[0], value);
+    #define DEBUG
+    return state;
+    #endif
 }
 
 int CreateList(List_t* lst, int capacity)
