@@ -33,6 +33,7 @@ typedef struct
     int* prev;
     int free_head;
     int capacity;
+    int size;
 } List_t;
 
 int CreateList(List_t* lst, int capacity);
@@ -111,8 +112,13 @@ void ListLink(List_t* lst, int idx, int left, int right)
     printf("\n");\
 }
 
+
+
 void ListDump(List_t* lst)
 {
+    //FILE* dot_file = fopen("graph.txt", "r");
+    //fprintf(dot_file, "digraph html {\n");
+
     printf("indexes data:            ");
     for(int i = 0; i <= lst->capacity; ++i)
     {
@@ -124,7 +130,7 @@ void ListDump(List_t* lst)
     PrintArray(prev);
     printf("info: ");
     ListPrint(lst);
-    printf("\n");
+    printf("size = %d\n", lst->size);
 }
 
 void ListClear(List_t* lst)
@@ -310,6 +316,8 @@ void ListFreeNode(List_t* lst, int idx)
     lst->prev[idx] = none;
     lst->free_head = idx;
 
+    lst->size -= 1;
+
     CHECK();
 }
 
@@ -321,6 +329,8 @@ int ListAllocNode(List_t* lst)
     if (lst->free_head == 0) return zero;
     int idx = lst->free_head;
     lst->free_head = lst->next[idx];
+
+    lst->size += 1;
 
     CHECK();
     return idx;
@@ -392,8 +402,25 @@ int CreateList(List_t* lst, int capacity)
     #endif
 
     lst->data = calloc(capacity + 1, sizeof(int));
+    if (lst->data == NULL)
+    {
+        printf("ERROR %d\n", SEG_FAULT_DATA);
+        exit(-1);
+    }
+
     lst->next = calloc(capacity + 1, sizeof(int));
+    if (lst->next == NULL)
+    {
+        printf("ERROR %d\n", SEG_FAULT_NEXT);
+        exit(-1);
+    }
     lst->prev = calloc(capacity + 1, sizeof(int));
+    if (lst->prev == NULL)
+    {
+        printf("ERROR %d\n", SEG_FAULT_PREV);
+        exit(-1);
+    }
+
     lst->capacity = capacity;
     lst->free_head = 1;
 
@@ -413,4 +440,82 @@ int CreateList(List_t* lst, int capacity)
     return state;
 }
 
-#endif // LIST_H_INCLUDED
+void ListDumpDot(const List_t* lst, const char *filename)
+{
+    FILE* dump = fopen(filename, "w");
+    if (dump == NULL) return;
+
+    fprintf(dump, "digraph G {\n");
+    fprintf(dump, " rankdir=TB;\n");
+    fprintf(dump, " splines=true;\n");
+    fprintf(dump, " nodesep=0.6;\n");
+    fprintf(dump, " ranksep=1.5;\n");
+    fprintf(dump, " node [shape=none, margin=0, fontname=\"Helvetica\"];\n");
+
+    fprintf(dump, " anchor [shape=point, style=invis, width=0];\n");
+    fprintf(dump, " { rank=same; anchor; ");
+
+    for (int curr = 0; curr <= lst->capacity; ++curr)
+    {
+        int free_cell = (curr != 0 && lst->prev[curr] == none);
+
+        const char *color = "#add8e6";
+        if (curr == 0) color = "gold";
+        else if (free_cell) color = "#e0e0e0";
+
+        fprintf(dump, " node%d [label=<\n", curr);
+        fprintf(dump, " <table border=\"1\" cellborder=\"1\" cellspacing=\"0\" cellpadding=\"4\" bgcolor=\"%s\">\n", color);
+        fprintf(dump, " <tr><td colspan=\"2\"><b>INDEX = %d</b></td></tr>\n", curr);
+
+        if (curr == 0) fprintf(dump, " <tr><td colspan=\"2\">SENTINEL</td></tr>\n");
+        else if (free_cell) fprintf(dump, " <tr><td colspan=\"2\">FREE</td></tr>\n");
+        else fprintf(dump, " <tr><td colspan=\"2\">DATA = %d</td></tr>\n", lst->data[curr]);
+
+        if (!free_cell) fprintf(dump, " <tr><td>NEXT = %d</td><td>PREV = %d</td></tr>\n", lst->next[curr], lst->prev[curr]);
+        else fprintf(dump, " <tr><td colspan=\"2\">NEXT = %d</td></tr>\n", lst->next[curr]);
+
+        fprintf(dump, " </table>\n");
+        fprintf(dump, " >];\n");
+    }
+
+    fprintf(dump, " }\n");
+
+    for (int i = 0; i <= lst->capacity; i++)
+    {
+        fprintf(dump, " anchor -> node%d [style=invis];\n", i);
+        if (i > 0) fprintf(dump, " node%d -> node%d [style=invis, weight=100];\n", i - 1, i);
+    }
+
+    for (int i = 0; i <= lst->capacity; i++)
+    {
+        if ((i == 0 || lst->prev[i] != none) && lst->next[i] != none)
+        {
+            if (i == 0 && lst->next[i] == 0) continue;
+
+            fprintf(dump, " node%d:n -> node%d:n [color=blue, constraint=false, penwidth=1.5];\n", i, lst->next[i]);
+        }
+    }
+
+    for (int i = 0; i <= lst->capacity; i++)
+    {
+        if ((i == 0 || lst->prev[i] != none) && lst->prev[i] != none)
+        {
+            if (i == 0 && lst->prev[i] == 0) continue;
+
+            fprintf(dump, " node%d:s -> node%d:s [color=red, dir=back, constraint=false, penwidth=1.5];\n", lst->prev[i], i);
+        }
+    }
+
+    for (int i = 1; i <= lst->capacity; i++)
+    {
+        if (lst->prev[i] == none && lst->next[i] != none)
+        {
+            fprintf(dump, " node%d -> node%d [color=gray, style=dashed, constraint=false];\n", i, lst->next[i]);
+        }
+    }
+
+    fprintf(dump, "}\n");
+    fclose(dump);
+}
+
+#endif
