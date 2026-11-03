@@ -22,7 +22,8 @@ enum
     LOOP_LIST = 7,
     ELEMENT_DOES_NOT_EXIST = 8,
     LIST_INDEX_OUT_OF_RANGE = 9,
-    INVALID_INDEX = 10
+    INVALID_INDEX = 10,
+    CONNECTION_FAILED = 11
 };
 
 typedef struct
@@ -343,6 +344,7 @@ int ListVerify(List_t* lst)
     int counter = 0;
     while (i != 0)
     {
+        if (i != lst->prev[lst->next[i]]) return CONNECTION_FAILED;
         i = lst->next[i];
         if (++counter > lst->capacity) return LOOP_LIST;
     }
