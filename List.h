@@ -23,7 +23,8 @@ enum
     ELEMENT_DOES_NOT_EXIST = 8,
     LIST_INDEX_OUT_OF_RANGE = 9,
     INVALID_INDEX = 10,
-    CONNECTION_FAILED = 11
+    CONNECTION_FAILED = 11,
+    CANARY_DAMAGED = 12
 };
 
 typedef struct
@@ -59,8 +60,8 @@ int CheckIndex(List_t* lst, int idx);
 
 int CheckIndex(List_t* lst, int idx)
 {
-    if (idx > lst->capacity) return LIST_INDEX_OUT_OF_RANGE;
-    for (int i = lst->free_head; i != 0; i = lst->next[i])
+    if (idx > lst->capacity || idx < 0) return LIST_INDEX_OUT_OF_RANGE;
+    for (int i = lst->free_head; i != none; i = lst->next[i])
     {
         if (idx == i) return INVALID_INDEX;
     }
@@ -112,8 +113,6 @@ void ListLink(List_t* lst, int idx, int left, int right)
     printf("\n");\
 }
 
-
-
 void ListDump(List_t* lst)
 {
     //FILE* dot_file = fopen("graph.txt", "r");
@@ -148,7 +147,7 @@ void ListClear(List_t* lst)
         lst->next[i] = i + 1;
         lst->prev[i] = none;
     }
-    lst->next[lst->capacity] = zero;
+    lst->next[lst->capacity] = none;
 
     CHECK();
 }
@@ -170,7 +169,7 @@ int ListInsertBefore(List_t* lst, int idx, int value)
 
     int id = ListAllocNode(lst);
 
-    if (id == zero)
+    if (id == none)
     {
         #ifdef DEBUG
         printf("ERROR %d, element %d haven't been pushed front, because capacity = %d\nList: ", LIST_OVERFLOW, value, lst->capacity);
@@ -206,7 +205,7 @@ int ListInsertAfter(List_t* lst, int idx, int value)
 
     int id = ListAllocNode(lst);
 
-    if (id == zero)
+    if (id == none)
     {
         #ifdef DEBUG
         printf("ERROR %d, element %d haven't been pushed front, because capacity = %d\nList: ", LIST_OVERFLOW, value, lst->capacity);
@@ -255,7 +254,7 @@ int ListFindIndex(List_t* lst, int idx)
         if (index == 0)
         {
             #ifdef DEBUG
-            printf("ERROR %d; no index %d\n", LIST_INDEX_OUT_OF_RANGE, idx);
+            printf("ERROR %d; no index %d\n", INVALID_INDEX, idx);
             ListDump(lst);
             printf("\a");
             #endif
@@ -326,7 +325,7 @@ int ListAllocNode(List_t* lst)
     int state = OK;
     CHECK();
 
-    if (lst->free_head == 0) return zero;
+    if (lst->free_head == none) return none;
     int idx = lst->free_head;
     lst->free_head = lst->next[idx];
 
@@ -349,6 +348,8 @@ int ListVerify(List_t* lst)
     if (lst->data == NULL) return SEG_FAULT_DATA;
     if (lst->next == NULL) return SEG_FAULT_NEXT;
     if (lst->prev == NULL) return SEG_FAULT_PREV;
+
+    if (lst->data[0] != poizon) return CANARY_DAMAGED;
 
     int i = lst->next[0];
     int counter = 0;
@@ -434,7 +435,7 @@ int CreateList(List_t* lst, int capacity)
         lst->next[i] = i + 1;
         lst->prev[i] = none;
     }
-    lst->next[capacity] = zero;
+    lst->next[capacity] = none;
 
     CHECK();
     return state;
@@ -488,7 +489,7 @@ void ListDumpDot(const List_t* lst, const char *filename)
 
     for (int i = 0; i <= lst->capacity; i++)
     {
-        if ((i == 0 || lst->prev[i] != none) && lst->next[i] != none)
+        if ((i == 0 || lst->prev[i] != none) && lst->next[i] != zero)
         {
             if (i == 0 && lst->next[i] == 0) continue;
 
@@ -498,7 +499,7 @@ void ListDumpDot(const List_t* lst, const char *filename)
 
     for (int i = 0; i <= lst->capacity; i++)
     {
-        if ((i == 0 || lst->prev[i] != none) && lst->prev[i] != none)
+        if ((i == 0 || lst->prev[i] != none) && lst->prev[i] != zero)
         {
             if (i == 0 && lst->prev[i] == 0) continue;
 
