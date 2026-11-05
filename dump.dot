@@ -79,7 +79,7 @@ digraph G {
  <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#e0e0e0">
  <tr><td colspan="2"><b>INDEX = 10</b></td></tr>
  <tr><td colspan="2">FREE</td></tr>
- <tr><td colspan="2">NEXT = 0</td></tr>
+ <tr><td colspan="2">NEXT = -1</td></tr>
  </table>
  >];
  }
@@ -106,11 +106,9 @@ digraph G {
  node9 -> node10 [style=invis, weight=100];
  node0:n -> node1:n [color=blue, constraint=false, penwidth=1.5];
  node1:n -> node5:n [color=blue, constraint=false, penwidth=1.5];
- node2:n -> node0:n [color=blue, constraint=false, penwidth=1.5];
  node4:n -> node2:n [color=blue, constraint=false, penwidth=1.5];
  node5:n -> node4:n [color=blue, constraint=false, penwidth=1.5];
  node2:s -> node0:s [color=red, dir=back, constraint=false, penwidth=1.5];
- node0:s -> node1:s [color=red, dir=back, constraint=false, penwidth=1.5];
  node4:s -> node2:s [color=red, dir=back, constraint=false, penwidth=1.5];
  node5:s -> node4:s [color=red, dir=back, constraint=false, penwidth=1.5];
  node1:s -> node5:s [color=red, dir=back, constraint=false, penwidth=1.5];
@@ -119,5 +117,4 @@ digraph G {
  node7 -> node8 [color=gray, style=dashed, constraint=false];
  node8 -> node9 [color=gray, style=dashed, constraint=false];
  node9 -> node10 [color=gray, style=dashed, constraint=false];
- node10 -> node0 [color=gray, style=dashed, constraint=false];
 }
