@@ -487,32 +487,24 @@ void ListDumpDot(const List_t* lst, const char *filename)
         if (i > 0) fprintf(dump, " node%d -> node%d [style=invis, weight=100];\n", i - 1, i);
     }
 
-    for (int i = 0; i <= lst->capacity; i++)
-    {
-        if ((i == 0 || lst->prev[i] != none) && lst->next[i] != zero)
-        {
-            if (i == 0 && lst->next[i] == 0) continue;
-
-            fprintf(dump, " node%d:n -> node%d:n [color=blue, constraint=false, penwidth=1.5];\n", i, lst->next[i]);
-        }
-    }
-
-    for (int i = 0; i <= lst->capacity; i++)
-    {
-        if ((i == 0 || lst->prev[i] != none) && lst->prev[i] != zero)
-        {
-            if (i == 0 && lst->prev[i] == 0) continue;
-
-            fprintf(dump, " node%d:s -> node%d:s [color=red, dir=back, constraint=false, penwidth=1.5];\n", lst->prev[i], i);
-        }
-    }
+    fprintf(dump, " node%d:n -> node%d:n [color=green, constraint=false, penwidth=1.5];\n", 0, lst->next[0]);
+    fprintf(dump, " node%d:s -> node%d:s [color=orange, dir=back, constraint=false, penwidth=1.5];\n", lst->prev[0], 0);
 
     for (int i = 1; i <= lst->capacity; i++)
     {
-        if (lst->prev[i] == none && lst->next[i] != none)
+        if (lst->prev[i] != none)
         {
-            fprintf(dump, " node%d -> node%d [color=gray, style=dashed, constraint=false];\n", i, lst->next[i]);
+            if (lst->next[i] != zero)
+            {
+                if (i != 0 || lst->next[i] != zero) fprintf(dump, " node%d:n -> node%d:n [color=blue, constraint=false, penwidth=1.5];\n", i, lst->next[i]);
+            }
+
+            if (lst->prev[i] != zero)
+            {
+                if (i != 0 || lst->prev[i] != zero) fprintf(dump, " node%d:s -> node%d:s [color=red, dir=back, constraint=false, penwidth=1.5];\n", lst->prev[i], i);
+            }
         }
+        if (lst->prev[i] == none && lst->next[i] != none) fprintf(dump, " node%d -> node%d [color=gray, style=dashed, constraint=false];\n", i, lst->next[i]);
     }
 
     fprintf(dump, "}\n");
