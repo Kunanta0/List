@@ -1,11 +1,13 @@
 digraph G {
- rankdir=TB;
+ rankdir=LR;
  splines=true;
  nodesep=0.6;
  ranksep=1.5;
  node [shape=none, margin=0, fontname="Helvetica"];
+ edge [fontname="Helvetica", fontsize=12];
  anchor [shape=point, style=invis, width=0];
- { rank=same; anchor;  node0 [label=<
+ { rank=same; anchor;  }
+ node0 [label=<
  <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="gold">
  <tr><td colspan="2"><b>INDEX = 0</b></td></tr>
  <tr><td colspan="2">SENTINEL</td></tr>
@@ -13,21 +15,21 @@ digraph G {
  </table>
  >];
  node1 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#add8e6">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="orange">
  <tr><td colspan="2"><b>INDEX = 1</b></td></tr>
  <tr><td colspan="2">DATA = 7</td></tr>
  <tr><td>NEXT = 5</td><td>PREV = 0</td></tr>
  </table>
  >];
  node2 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#add8e6">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="violet">
  <tr><td colspan="2"><b>INDEX = 2</b></td></tr>
  <tr><td colspan="2">DATA = 6</td></tr>
  <tr><td>NEXT = 0</td><td>PREV = 4</td></tr>
  </table>
  >];
  node3 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#e0e0e0">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="green">
  <tr><td colspan="2"><b>INDEX = 3</b></td></tr>
  <tr><td colspan="2">FREE</td></tr>
  <tr><td colspan="2">NEXT = 6</td></tr>
@@ -48,41 +50,40 @@ digraph G {
  </table>
  >];
  node6 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#e0e0e0">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="green">
  <tr><td colspan="2"><b>INDEX = 6</b></td></tr>
  <tr><td colspan="2">FREE</td></tr>
  <tr><td colspan="2">NEXT = 7</td></tr>
  </table>
  >];
  node7 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#e0e0e0">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="green">
  <tr><td colspan="2"><b>INDEX = 7</b></td></tr>
  <tr><td colspan="2">FREE</td></tr>
  <tr><td colspan="2">NEXT = 8</td></tr>
  </table>
  >];
  node8 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#e0e0e0">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="green">
  <tr><td colspan="2"><b>INDEX = 8</b></td></tr>
  <tr><td colspan="2">FREE</td></tr>
  <tr><td colspan="2">NEXT = 9</td></tr>
  </table>
  >];
  node9 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#e0e0e0">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="green">
  <tr><td colspan="2"><b>INDEX = 9</b></td></tr>
  <tr><td colspan="2">FREE</td></tr>
  <tr><td colspan="2">NEXT = 10</td></tr>
  </table>
  >];
  node10 [label=<
- <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="#e0e0e0">
+ <table border="1" cellborder="1" cellspacing="0" cellpadding="4" bgcolor="green">
  <tr><td colspan="2"><b>INDEX = 10</b></td></tr>
  <tr><td colspan="2">FREE</td></tr>
  <tr><td colspan="2">NEXT = -1</td></tr>
  </table>
  >];
- }
  anchor -> node0 [style=invis];
  anchor -> node1 [style=invis];
  node0 -> node1 [style=invis, weight=100];
@@ -104,17 +105,17 @@ digraph G {
  node8 -> node9 [style=invis, weight=100];
  anchor -> node10 [style=invis];
  node9 -> node10 [style=invis, weight=100];
- node0:n -> node1:n [color=green, constraint=false, penwidth=1.5];
- node2:s -> node0:s [color=orange, dir=back, constraint=false, penwidth=1.5];
+ node0:n -> node1:n [color=blue, constraint=false, penwidth=1.5, label="HEAD", fontcolor=blue, fontsize=17];
+ node0:s -> node2:s [color=red, constraint=false, penwidth=1.5, label="TAIL", fontcolor=red, fontsize=17];
  node1:n -> node5:n [color=blue, constraint=false, penwidth=1.5];
- node4:s -> node2:s [color=red, dir=back, constraint=false, penwidth=1.5];
- node3 -> node6 [color=gray, style=dashed, constraint=false];
+ node2:s -> node4:s [color=red, constraint=false, penwidth=1.5];
+ node3 -> node6 [color=green, style=dashed, constraint=false];
  node4:n -> node2:n [color=blue, constraint=false, penwidth=1.5];
- node5:s -> node4:s [color=red, dir=back, constraint=false, penwidth=1.5];
+ node4:s -> node5:s [color=red, constraint=false, penwidth=1.5];
  node5:n -> node4:n [color=blue, constraint=false, penwidth=1.5];
- node1:s -> node5:s [color=red, dir=back, constraint=false, penwidth=1.5];
- node6 -> node7 [color=gray, style=dashed, constraint=false];
- node7 -> node8 [color=gray, style=dashed, constraint=false];
- node8 -> node9 [color=gray, style=dashed, constraint=false];
- node9 -> node10 [color=gray, style=dashed, constraint=false];
+ node5:s -> node1:s [color=red, constraint=false, penwidth=1.5];
+ node6 -> node7 [color=green, style=dashed, constraint=false];
+ node7 -> node8 [color=green, style=dashed, constraint=false];
+ node8 -> node9 [color=green, style=dashed, constraint=false];
+ node9 -> node10 [color=green, style=dashed, constraint=false];
 }
