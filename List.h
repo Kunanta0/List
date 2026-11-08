@@ -24,7 +24,8 @@ enum
     LIST_INDEX_OUT_OF_RANGE = 9,
     INVALID_INDEX = 10,
     CONNECTION_FAILED = 11,
-    CANARY_DAMAGED = 12
+    CANARY_DAMAGED = 12,
+    ERROR_COMPILING_GRAPHVIZ = 13
 };
 
 typedef struct
@@ -35,6 +36,7 @@ typedef struct
     int free_head;
     int capacity;
     int size;
+    int dump_count;
 } List_t;
 
 int CreateList(List_t* lst, int capacity);
@@ -57,6 +59,8 @@ void ListDump(List_t* lst);
 void ListLink(List_t* lst, int idx, int a, int b);
 void ListFree(List_t* lst);
 int CheckIndex(List_t* lst, int idx);
+void ListDumpDot(const List_t* lst, const char *filename, const char* func, int idx, int value);
+void ListDumpFinish(List_t* lst);
 
 int CheckIndex(List_t* lst, int idx)
 {
@@ -115,9 +119,6 @@ void ListLink(List_t* lst, int idx, int left, int right)
 
 void ListDump(List_t* lst)
 {
-    //FILE* dot_file = fopen("graph.txt", "r");
-    //fprintf(dot_file, "digraph html {\n");
-
     printf("indexes data:            ");
     for(int i = 0; i <= lst->capacity; ++i)
     {
@@ -184,6 +185,7 @@ int ListInsertBefore(List_t* lst, int idx, int value)
     int right = idx;
     ListLink(lst, id, left, right);
     CHECK();
+    ListDumpDot(lst, "dot.txt", "InsertBefore", idx, value);
 
     return OK;
 }
@@ -220,6 +222,7 @@ int ListInsertAfter(List_t* lst, int idx, int value)
     int left = idx;
     ListLink(lst, id, left, right);
     CHECK();
+    ListDumpDot(lst, "dot.txt", "InsertAfter", idx, value);
 
     return OK;
 }
@@ -304,6 +307,7 @@ void ListErase(List_t* lst, int idx)
     ListFreeNode(lst, idx);
 
     CHECK();
+    ListDumpDot(lst, "dot.txt", "Erase", none, idx);
 }
 
 void ListFreeNode(List_t* lst, int idx)
@@ -316,6 +320,7 @@ void ListFreeNode(List_t* lst, int idx)
     lst->free_head = idx;
 
     lst->size -= 1;
+    lst->dump_count += 1;
 
     CHECK();
 }
@@ -330,6 +335,7 @@ int ListAllocNode(List_t* lst)
     lst->free_head = lst->next[idx];
 
     lst->size += 1;
+    lst->dump_count += 1;
 
     CHECK();
     return idx;
@@ -338,7 +344,7 @@ int ListAllocNode(List_t* lst)
 int CtorVerify(List_t* lst)
 {
     if (lst == NULL) return SEG_FAULT_LIST;
-    if (lst->data == NULL && lst->next == NULL && lst->capacity == 0) return OK;
+    if (lst->data == NULL && lst->next == NULL && lst->capacity == 0 && lst->size == 0 && lst->dump_count == 0) return OK;
     return CALL_CONSTRUCTOR_FOR_EXISTING_LIST;
 }
 
@@ -438,31 +444,37 @@ int CreateList(List_t* lst, int capacity)
     lst->next[capacity] = none;
 
     CHECK();
+
+    ListDumpDot(lst, "dot.txt", "Create", none, capacity);
     return state;
 }
 
-void ListDumpDot(const List_t* lst, const char *filename)
+void ListDumpDot(const List_t* lst, const char *filename, const char* func, int idx, int value)
 {
     FILE* dump = fopen(filename, "w");
     if (dump == NULL) return;
 
     fprintf(dump, "digraph G {\n");
-    fprintf(dump, " rankdir=TB;\n");
+    fprintf(dump, " rankdir=LR;\n");
     fprintf(dump, " splines=true;\n");
     fprintf(dump, " nodesep=0.6;\n");
     fprintf(dump, " ranksep=1.5;\n");
     fprintf(dump, " node [shape=none, margin=0, fontname=\"Helvetica\"];\n");
+    fprintf(dump, " edge [fontname=\"Helvetica\", fontsize=12];\n");
 
     fprintf(dump, " anchor [shape=point, style=invis, width=0];\n");
     fprintf(dump, " { rank=same; anchor; ");
+    fprintf(dump, " }\n");
 
     for (int curr = 0; curr <= lst->capacity; ++curr)
     {
         int free_cell = (curr != 0 && lst->prev[curr] == none);
 
-        const char *color = "#add8e6";
+        const char *color = "#add8e6";//light blue
         if (curr == 0) color = "gold";
-        else if (free_cell) color = "#e0e0e0";
+        else if (free_cell) color = "green";//grey
+        else if (curr == lst->next[0]) color = "orange";
+        else if (curr == lst->prev[0]) color = "violet";
 
         fprintf(dump, " node%d [label=<\n", curr);
         fprintf(dump, " <table border=\"1\" cellborder=\"1\" cellspacing=\"0\" cellpadding=\"4\" bgcolor=\"%s\">\n", color);
@@ -479,7 +491,6 @@ void ListDumpDot(const List_t* lst, const char *filename)
         fprintf(dump, " >];\n");
     }
 
-    fprintf(dump, " }\n");
 
     for (int i = 0; i <= lst->capacity; i++)
     {
@@ -487,28 +498,56 @@ void ListDumpDot(const List_t* lst, const char *filename)
         if (i > 0) fprintf(dump, " node%d -> node%d [style=invis, weight=100];\n", i - 1, i);
     }
 
-    fprintf(dump, " node%d:n -> node%d:n [color=green, constraint=false, penwidth=1.5];\n", 0, lst->next[0]);
-    fprintf(dump, " node%d:s -> node%d:s [color=orange, dir=back, constraint=false, penwidth=1.5];\n", lst->prev[0], 0);
+    fprintf(dump, " node%d:n -> node%d:n [color=blue, constraint=false, penwidth=1.5, label=\"HEAD\", fontcolor=blue, fontsize=17];\n", 0, lst->next[0]);
+    fprintf(dump, " node%d:s -> node%d:s [color=red, constraint=false, penwidth=1.5, label=\"TAIL\", fontcolor=red, fontsize=17];\n", 0, lst->prev[0]);
 
     for (int i = 1; i <= lst->capacity; i++)
     {
         if (lst->prev[i] != none)
         {
-            if (lst->next[i] != zero)
-            {
-                if (i != 0 || lst->next[i] != zero) fprintf(dump, " node%d:n -> node%d:n [color=blue, constraint=false, penwidth=1.5];\n", i, lst->next[i]);
-            }
-
-            if (lst->prev[i] != zero)
-            {
-                if (i != 0 || lst->prev[i] != zero) fprintf(dump, " node%d:s -> node%d:s [color=red, dir=back, constraint=false, penwidth=1.5];\n", lst->prev[i], i);
-            }
+            if (lst->next[i] != zero) fprintf(dump, " node%d:n -> node%d:n [color=blue, constraint=false, penwidth=1.5];\n", i, lst->next[i]);
+            if (lst->prev[i] != zero) fprintf(dump, " node%d:s -> node%d:s [color=red, constraint=false, penwidth=1.5];\n", i, lst->prev[i]);
         }
-        if (lst->prev[i] == none && lst->next[i] != none) fprintf(dump, " node%d -> node%d [color=gray, style=dashed, constraint=false];\n", i, lst->next[i]);
+        else if (lst->next[i] != none) fprintf(dump, " node%d -> node%d [color=green, style=dashed, constraint=false];\n", i, lst->next[i]);
     }
 
     fprintf(dump, "}\n");
     fclose(dump);
+
+    char cmd[256];
+
+    const char* dot_path = "\"C:\\Program Files\\Graphviz\\bin\\dot.exe\"";
+    snprintf(cmd, sizeof(cmd), "%s -Tpng dot.txt -o Dump_%d.png", dot_path, lst->dump_count);
+
+    int result = system(cmd);
+
+    if (result == 0) printf("Graph has been compiled into Dump_%d.png correctly\n", lst->dump_count);
+    else printf("ERROR: %d; Graph hasn't been compiled into Dump.png correctly\n", ERROR_COMPILING_GRAPHVIZ);
+
+    FILE *html = fopen("dumps.html", "a");
+    if (html != NULL)
+    {
+        if (lst->dump_count == 1)
+        {
+            fprintf(html, "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n");
+            fprintf(html, "<title>Dump story</title>\n");
+            fprintf(html, "<style>\n");
+            fprintf(html, " body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }\n");
+            fprintf(html, " .dump { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }\n");
+            fprintf(html, " h2 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 5px; }\n");
+            fprintf(html, " img { max-width: 100%%; height: auto; }\n");
+            fprintf(html, "</style>\n</head>\n<body>\n");
+        }
+
+        fprintf(html, "<div class=\"dump\">\n");
+        if (idx != none) fprintf(html, " <h2>Call #%d\n%s(%d, %d)</h2>\n", lst->dump_count, func, idx, value);
+        else fprintf(html, " <h2>Call #%d\n%s(%d)</h2>\n", lst->dump_count, func, value);
+
+        fprintf(html, " <img src=\"Dump_%d.png\" alt=\"Dump_%d\">\n", lst->dump_count, lst->dump_count);
+        fprintf(html, "</div>\n");
+
+        fclose(html);
+    }
 }
 
 #endif
