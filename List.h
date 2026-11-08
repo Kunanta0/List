@@ -463,12 +463,11 @@ void ListDumpDot(const List_t* lst, const char *filename, const char* func, int 
     fprintf(dump, " edge [fontname=\"Helvetica\", fontsize=12];\n");
 
     fprintf(dump, " anchor [shape=point, style=invis, width=0];\n");
-    fprintf(dump, " { rank=same; anchor; ");
-    fprintf(dump, " }\n");
+    fprintf(dump, " { rank=same; anchor; }\n");
 
     for (int curr = 0; curr <= lst->capacity; ++curr)
     {
-        int free_cell = (curr != 0 && lst->prev[curr] == none);
+        int free_cell = lst->prev[curr] == none;
 
         const char *color = "#add8e6";//light blue
         if (curr == 0) color = "gold";
@@ -522,12 +521,12 @@ void ListDumpDot(const List_t* lst, const char *filename, const char* func, int 
     int result = system(cmd);
 
     if (result == 0) printf("Graph has been compiled into Dump_%d.png correctly\n", lst->dump_count);
-    else printf("ERROR: %d; Graph hasn't been compiled into Dump.png correctly\n", ERROR_COMPILING_GRAPHVIZ);
+    else printf("ERROR: %d; Graph hasn't been compiled into Dump_%d.png correctly\n", ERROR_COMPILING_GRAPHVIZ, lst->dump_count);
 
     FILE *html = fopen("dumps.html", "a");
     if (html != NULL)
     {
-        if (lst->dump_count == 1)
+        if (lst->dump_count == 0)
         {
             fprintf(html, "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n");
             fprintf(html, "<title>Dump story</title>\n");
