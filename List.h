@@ -460,7 +460,6 @@ void ListDumpDot(const List_t* lst, const char *filename, const char* func, int 
     fprintf(dump, " nodesep=0.6;\n");
     fprintf(dump, " ranksep=1.5;\n");
     fprintf(dump, " node [shape=none, margin=0, fontname=\"Helvetica\"];\n");
-    fprintf(dump, " edge [fontname=\"Helvetica\", fontsize=12];\n");
 
     fprintf(dump, " anchor [shape=point, style=invis, width=0];\n");
     fprintf(dump, " { rank=same; anchor; }\n");
@@ -471,7 +470,7 @@ void ListDumpDot(const List_t* lst, const char *filename, const char* func, int 
 
         const char *color = "#add8e6";//light blue
         if (curr == 0) color = "gold";
-        else if (free_cell) color = "green";//grey
+        else if (free_cell) color = "green";
         else if (curr == lst->next[0]) color = "orange";
         else if (curr == lst->prev[0]) color = "violet";
 
@@ -526,25 +525,78 @@ void ListDumpDot(const List_t* lst, const char *filename, const char* func, int 
     FILE *html = fopen("dumps.html", "a");
     if (html != NULL)
     {
-        if (lst->dump_count == 0)
-        {
-            fprintf(html, "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n");
-            fprintf(html, "<title>Dump story</title>\n");
+        if (lst->dump_count == 0) {
+            fprintf(html, "<!DOCTYPE html>\n<html>\n<head>\n");
+            fprintf(html, "<meta charset=\"UTF-8\">\n");
+            fprintf(html, "<title>List Dumps</title>\n");
             fprintf(html, "<style>\n");
-            fprintf(html, " body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }\n");
-            fprintf(html, " .dump { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }\n");
-            fprintf(html, " h2 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 5px; }\n");
-            fprintf(html, " img { max-width: 100%%; height: auto; }\n");
+            fprintf(html, " body { font-family: Consolas, monospace; background: #f4f4f4; padding: 20px; }\n");
+            fprintf(html, " .dump { background: white; padding: 20px; margin-bottom: 40px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }\n");
+            fprintf(html, " h2 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 5px; font-family: Arial; }\n");
+            fprintf(html, " img { max-width: 100%%; height: auto; margin-bottom: 20px; }\n");
+            fprintf(html, " table { border-collapse: collapse; font-family: Consolas, monospace; font-size: 14px; }\n");
+            fprintf(html, " th, td { border: 1px solid #999; padding: 5px 10px; text-align: right; }\n");
+            fprintf(html, " th { background-color: #eee; text-align: center; }\n");
+            fprintf(html, " .free { background-color: #d4edda; color: #155724; }\n");
+            fprintf(html, " .sentinel { background-color: #fff3cd; color: #856404; }\n");
+            fprintf(html, " .head { background-color: #ffa500;}\n");
+            fprintf(html, " .tail { background-color: #ee82ee;}\n");
             fprintf(html, "</style>\n</head>\n<body>\n");
+            fprintf(html, "<h1>List State History</h1>\n");
         }
 
         fprintf(html, "<div class=\"dump\">\n");
         if (idx != none) fprintf(html, " <h2>Call #%d\n%s(%d, %d)</h2>\n", lst->dump_count, func, idx, value);
         else fprintf(html, " <h2>Call #%d\n%s(%d)</h2>\n", lst->dump_count, func, value);
 
-        fprintf(html, " <img src=\"Dump_%d.png\" alt=\"Dump_%d\">\n", lst->dump_count, lst->dump_count);
-        fprintf(html, "</div>\n");
+        fprintf(html, " <table>\n");
 
+        fprintf(html, " <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>\n");
+
+        for (int i = 0; i <= lst->capacity; i++)
+        {
+            const char* row_class = "";
+
+            if (i == 0) row_class = " class=\"sentinel\"";
+            else if (i == lst->next[0]) row_class = " class=\"head\"";
+            else if (i == lst->prev[0]) row_class = " class=\"tail\"";
+            else if (lst->prev[i] == none) row_class = " class=\"free\"";
+
+            fprintf(html, " <tr%s>\n", row_class);
+            fprintf(html, " <td><b>%d</b></td>\n", i);
+
+            fprintf(html, " <td>%d</td>\n", lst->data[i]);
+
+            fprintf(html, " <td>%d</td>\n", lst->next[i]);
+            fprintf(html, " <td>%d</td>\n", lst->prev[i]);
+            fprintf(html, " </tr>\n");
+        }
+
+        fprintf(html, " </table>\n");
+
+        fprintf(html, " <div style=\"margin-top: 15px; font-size: 18px; font-weight: bold;\">\n");
+        fprintf(html, "  List: ");
+
+        int curr = lst->next[0];
+
+        if (curr == 0) fprintf(html, "empty\n");
+        else
+        {
+            while (curr != 0)
+            {
+                fprintf(html, "%d", lst->data[curr]);
+
+                curr = lst->next[curr];
+                if (curr) fprintf(html, " -> ");
+            }
+
+            fprintf(html, ".\n");
+        }
+        fprintf(html, " </div>\n");
+
+        fprintf(html, " <img src=\"Dump_%d.png\" alt=\"Dump_%d\">\n", lst->dump_count, lst->dump_count);
+
+        fprintf(html, "</div>\n");
         fclose(html);
     }
 }
