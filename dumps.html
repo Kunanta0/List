@@ -2,47 +2,559 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dump story</title>
+<title>List Dumps</title>
 <style>
- body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
- .dump { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
- h2 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
- img { max-width: 100%; height: auto; }
+ body { font-family: Consolas, monospace; background: #f4f4f4; padding: 20px; }
+ .dump { background: white; padding: 20px; margin-bottom: 40px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+ h2 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 5px; font-family: Arial; }
+ img { max-width: 100%; height: auto; margin-bottom: 20px; }
+ table { border-collapse: collapse; font-family: Consolas, monospace; font-size: 14px; }
+ th, td { border: 1px solid #999; padding: 5px 10px; text-align: right; }
+ th { background-color: #eee; text-align: center; }
+ .free { background-color: #d4edda; color: #155724; }
+ .sentinel { background-color: #fff3cd; color: #856404; }
+ .head { background-color: #ffa500;}
+ .tail { background-color: #ee82ee;}
 </style>
 </head>
 <body>
+<h1>List State History</h1>
 <div class="dump">
  <h2>Call #0
 Create(10)</h2>
+ <table>
+ <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>
+ <tr class="sentinel">
+ <td><b>0</b></td>
+ <td>-67</td>
+ <td>0</td>
+ <td>0</td>
+ </tr>
+ <tr class="free">
+ <td><b>1</b></td>
+ <td>-67</td>
+ <td>2</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>2</b></td>
+ <td>-67</td>
+ <td>3</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>3</b></td>
+ <td>-67</td>
+ <td>4</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>4</b></td>
+ <td>-67</td>
+ <td>5</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>5</b></td>
+ <td>-67</td>
+ <td>6</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>6</b></td>
+ <td>-67</td>
+ <td>7</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>7</b></td>
+ <td>-67</td>
+ <td>8</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>8</b></td>
+ <td>-67</td>
+ <td>9</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>9</b></td>
+ <td>-67</td>
+ <td>10</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>10</b></td>
+ <td>-67</td>
+ <td>-1</td>
+ <td>-1</td>
+ </tr>
+ </table>
+ <div style="margin-top: 15px; font-size: 18px; font-weight: bold;">
+  List: empty
+ </div>
  <img src="Dump_0.png" alt="Dump_0">
 </div>
 <div class="dump">
  <h2>Call #1
 InsertAfter(0, 7)</h2>
+ <table>
+ <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>
+ <tr class="sentinel">
+ <td><b>0</b></td>
+ <td>-67</td>
+ <td>1</td>
+ <td>1</td>
+ </tr>
+ <tr class="head">
+ <td><b>1</b></td>
+ <td>7</td>
+ <td>0</td>
+ <td>0</td>
+ </tr>
+ <tr class="free">
+ <td><b>2</b></td>
+ <td>-67</td>
+ <td>3</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>3</b></td>
+ <td>-67</td>
+ <td>4</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>4</b></td>
+ <td>-67</td>
+ <td>5</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>5</b></td>
+ <td>-67</td>
+ <td>6</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>6</b></td>
+ <td>-67</td>
+ <td>7</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>7</b></td>
+ <td>-67</td>
+ <td>8</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>8</b></td>
+ <td>-67</td>
+ <td>9</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>9</b></td>
+ <td>-67</td>
+ <td>10</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>10</b></td>
+ <td>-67</td>
+ <td>-1</td>
+ <td>-1</td>
+ </tr>
+ </table>
+ <div style="margin-top: 15px; font-size: 18px; font-weight: bold;">
+  List: 7.
+ </div>
  <img src="Dump_1.png" alt="Dump_1">
 </div>
 <div class="dump">
  <h2>Call #2
 InsertAfter(1, 6)</h2>
+ <table>
+ <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>
+ <tr class="sentinel">
+ <td><b>0</b></td>
+ <td>-67</td>
+ <td>1</td>
+ <td>2</td>
+ </tr>
+ <tr class="head">
+ <td><b>1</b></td>
+ <td>7</td>
+ <td>2</td>
+ <td>0</td>
+ </tr>
+ <tr class="tail">
+ <td><b>2</b></td>
+ <td>6</td>
+ <td>0</td>
+ <td>1</td>
+ </tr>
+ <tr class="free">
+ <td><b>3</b></td>
+ <td>-67</td>
+ <td>4</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>4</b></td>
+ <td>-67</td>
+ <td>5</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>5</b></td>
+ <td>-67</td>
+ <td>6</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>6</b></td>
+ <td>-67</td>
+ <td>7</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>7</b></td>
+ <td>-67</td>
+ <td>8</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>8</b></td>
+ <td>-67</td>
+ <td>9</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>9</b></td>
+ <td>-67</td>
+ <td>10</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>10</b></td>
+ <td>-67</td>
+ <td>-1</td>
+ <td>-1</td>
+ </tr>
+ </table>
+ <div style="margin-top: 15px; font-size: 18px; font-weight: bold;">
+  List: 7 -> 6.
+ </div>
  <img src="Dump_2.png" alt="Dump_2">
 </div>
 <div class="dump">
  <h2>Call #3
 InsertBefore(1, 8)</h2>
+ <table>
+ <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>
+ <tr class="sentinel">
+ <td><b>0</b></td>
+ <td>-67</td>
+ <td>3</td>
+ <td>2</td>
+ </tr>
+ <tr>
+ <td><b>1</b></td>
+ <td>7</td>
+ <td>2</td>
+ <td>3</td>
+ </tr>
+ <tr class="tail">
+ <td><b>2</b></td>
+ <td>6</td>
+ <td>0</td>
+ <td>1</td>
+ </tr>
+ <tr class="head">
+ <td><b>3</b></td>
+ <td>8</td>
+ <td>1</td>
+ <td>0</td>
+ </tr>
+ <tr class="free">
+ <td><b>4</b></td>
+ <td>-67</td>
+ <td>5</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>5</b></td>
+ <td>-67</td>
+ <td>6</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>6</b></td>
+ <td>-67</td>
+ <td>7</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>7</b></td>
+ <td>-67</td>
+ <td>8</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>8</b></td>
+ <td>-67</td>
+ <td>9</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>9</b></td>
+ <td>-67</td>
+ <td>10</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>10</b></td>
+ <td>-67</td>
+ <td>-1</td>
+ <td>-1</td>
+ </tr>
+ </table>
+ <div style="margin-top: 15px; font-size: 18px; font-weight: bold;">
+  List: 8 -> 7 -> 6.
+ </div>
  <img src="Dump_3.png" alt="Dump_3">
 </div>
 <div class="dump">
  <h2>Call #4
 InsertAfter(1, 13)</h2>
+ <table>
+ <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>
+ <tr class="sentinel">
+ <td><b>0</b></td>
+ <td>-67</td>
+ <td>3</td>
+ <td>2</td>
+ </tr>
+ <tr>
+ <td><b>1</b></td>
+ <td>7</td>
+ <td>4</td>
+ <td>3</td>
+ </tr>
+ <tr class="tail">
+ <td><b>2</b></td>
+ <td>6</td>
+ <td>0</td>
+ <td>4</td>
+ </tr>
+ <tr class="head">
+ <td><b>3</b></td>
+ <td>8</td>
+ <td>1</td>
+ <td>0</td>
+ </tr>
+ <tr>
+ <td><b>4</b></td>
+ <td>13</td>
+ <td>2</td>
+ <td>1</td>
+ </tr>
+ <tr class="free">
+ <td><b>5</b></td>
+ <td>-67</td>
+ <td>6</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>6</b></td>
+ <td>-67</td>
+ <td>7</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>7</b></td>
+ <td>-67</td>
+ <td>8</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>8</b></td>
+ <td>-67</td>
+ <td>9</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>9</b></td>
+ <td>-67</td>
+ <td>10</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>10</b></td>
+ <td>-67</td>
+ <td>-1</td>
+ <td>-1</td>
+ </tr>
+ </table>
+ <div style="margin-top: 15px; font-size: 18px; font-weight: bold;">
+  List: 8 -> 7 -> 13 -> 6.
+ </div>
  <img src="Dump_4.png" alt="Dump_4">
 </div>
 <div class="dump">
  <h2>Call #5
 InsertAfter(1, 17)</h2>
+ <table>
+ <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>
+ <tr class="sentinel">
+ <td><b>0</b></td>
+ <td>-67</td>
+ <td>3</td>
+ <td>2</td>
+ </tr>
+ <tr>
+ <td><b>1</b></td>
+ <td>7</td>
+ <td>5</td>
+ <td>3</td>
+ </tr>
+ <tr class="tail">
+ <td><b>2</b></td>
+ <td>6</td>
+ <td>0</td>
+ <td>4</td>
+ </tr>
+ <tr class="head">
+ <td><b>3</b></td>
+ <td>8</td>
+ <td>1</td>
+ <td>0</td>
+ </tr>
+ <tr>
+ <td><b>4</b></td>
+ <td>13</td>
+ <td>2</td>
+ <td>5</td>
+ </tr>
+ <tr>
+ <td><b>5</b></td>
+ <td>17</td>
+ <td>4</td>
+ <td>1</td>
+ </tr>
+ <tr class="free">
+ <td><b>6</b></td>
+ <td>-67</td>
+ <td>7</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>7</b></td>
+ <td>-67</td>
+ <td>8</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>8</b></td>
+ <td>-67</td>
+ <td>9</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>9</b></td>
+ <td>-67</td>
+ <td>10</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>10</b></td>
+ <td>-67</td>
+ <td>-1</td>
+ <td>-1</td>
+ </tr>
+ </table>
+ <div style="margin-top: 15px; font-size: 18px; font-weight: bold;">
+  List: 8 -> 7 -> 17 -> 13 -> 6.
+ </div>
  <img src="Dump_5.png" alt="Dump_5">
 </div>
 <div class="dump">
  <h2>Call #6
 Erase(3)</h2>
+ <table>
+ <tr><th>Index</th><th>Data</th><th>Next</th><th>Prev</th></tr>
+ <tr class="sentinel">
+ <td><b>0</b></td>
+ <td>-67</td>
+ <td>1</td>
+ <td>2</td>
+ </tr>
+ <tr class="head">
+ <td><b>1</b></td>
+ <td>7</td>
+ <td>5</td>
+ <td>0</td>
+ </tr>
+ <tr class="tail">
+ <td><b>2</b></td>
+ <td>6</td>
+ <td>0</td>
+ <td>4</td>
+ </tr>
+ <tr class="free">
+ <td><b>3</b></td>
+ <td>8</td>
+ <td>6</td>
+ <td>-1</td>
+ </tr>
+ <tr>
+ <td><b>4</b></td>
+ <td>13</td>
+ <td>2</td>
+ <td>5</td>
+ </tr>
+ <tr>
+ <td><b>5</b></td>
+ <td>17</td>
+ <td>4</td>
+ <td>1</td>
+ </tr>
+ <tr class="free">
+ <td><b>6</b></td>
+ <td>-67</td>
+ <td>7</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>7</b></td>
+ <td>-67</td>
+ <td>8</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>8</b></td>
+ <td>-67</td>
+ <td>9</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>9</b></td>
+ <td>-67</td>
+ <td>10</td>
+ <td>-1</td>
+ </tr>
+ <tr class="free">
+ <td><b>10</b></td>
+ <td>-67</td>
+ <td>-1</td>
+ <td>-1</td>
+ </tr>
+ </table>
+ <div style="margin-top: 15px; font-size: 18px; font-weight: bold;">
+  List: 7 -> 17 -> 13 -> 6.
+ </div>
  <img src="Dump_6.png" alt="Dump_6">
 </div>
